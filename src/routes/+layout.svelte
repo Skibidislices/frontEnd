@@ -58,7 +58,6 @@
           {#if !isAuthenticated}
           <li><a href="/register" class="hover:underline">Register</a></li>
           <li><a href="/login" class="hover:underline">Login</a></li>
-          <li><a href="/reset-password" class="hover:underline">Reset Password</a></li>
           <li><a href="/about" class="hover:underline">About</a>
           </li>
           {/if}
