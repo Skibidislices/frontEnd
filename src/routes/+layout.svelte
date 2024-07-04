@@ -6,6 +6,9 @@
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
   import { authStore } from '$lib/authStore';
+  import { checkAuth } from '$lib/auth';
+  import { page } from '$app/stores';
+
   let showDropdown = false;
   let isAuthenticated;
 
@@ -38,18 +41,10 @@
       }
     };
   }
+  onMount(() => {
+    checkAuth($page.url.pathname);
+  })
 </script>
-
-<script context="module">
-  // This doesnt work todo fix
-  import { checkAuth } from '$lib/auth'; 
-
-  export const load = async ({ route }) => {
-    checkAuth(route.id); // Redirect if not authenticated
-    return {};
-  };
-</script>
-
 
 
 <div class="flex flex-col h-screen justify-between bg-gray-100">
