@@ -1,7 +1,7 @@
 <script>
-  import { onMount } from 'svelte';
-  import api from '$lib/axios';
+  import { onMount, onDestroy } from 'svelte';
   import { writable } from 'svelte/store';
+  import api from '$lib/axios';
 
   let isDragging = writable(false);
   let file = null;
@@ -13,8 +13,10 @@
     isDragging.set(true);
   }
 
-  function handleDragLeave() {
-    isDragging.set(false);
+  function handleDragLeave(event) {
+    if (event.clientX === 0 && event.clientY === 0) {
+      isDragging.set(false);
+    }
   }
 
   function handleDrop(event) {
@@ -49,32 +51,47 @@
       console.log('Received JSON data:', data);
     }
   });
+
+  onMount(() => {
+    document.addEventListener('dragover', handleDragOver);
+    document.addEventListener('dragleave', handleDragLeave);
+    document.addEventListener('drop', handleDrop);
+  });
 </script>
 
 <style>
   .drop-zone {
-    border: 2px dashed #cccccc;
-    border-radius: 10px;
-    padding: 20px;
-    text-align: center;
-    transition: background-color 0.3s ease;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    font-size: 1.5rem;
+    z-index: 1000;
+    transition: opacity 0.3s ease;
+    opacity: 0;
+    pointer-events: none;
   }
-  .drop-zone.dragging {
-    background-color: #f0f0f0;
+  .drop-zone.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+  .hidden-input {
+    display: none;
   }
   .file-list {
     margin-top: 20px;
   }
 </style>
 
-<div 
-  class="drop-zone { $isDragging ? 'dragging' : '' }"
-  on:dragover={handleDragOver}
-  on:dragleave={handleDragLeave}
-  on:drop={handleDrop}
->
-  <p>Drag and drop your Excel file here, or click to select file</p>
-  <input type="file" accept=".xlsx, .xls" on:change={e => uploadFile(e.target.files[0])} style="display: none;" />
+<div class="drop-zone { $isDragging ? 'active' : '' }">
+  <p>Drag and drop your Excel file here</p>
+  <input type="file" accept=".xlsx, .xls" class="hidden-input" on:change={e => uploadFile(e.target.files[0])} />
 </div>
 
 <p>{message}</p>
