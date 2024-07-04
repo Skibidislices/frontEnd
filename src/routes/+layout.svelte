@@ -23,6 +23,6 @@
     <!-- here the page content of +page.svelte is loaded -->
   </main>
   <footer class="bg-blue-500 p-4 text-white text-center">
-    <p>&copy; 2024 Your Company</p>
+    <p>&copy; 2024 Skibidi Slices</p>
   </footer>
 </div>
