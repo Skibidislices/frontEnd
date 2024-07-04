@@ -71,12 +71,12 @@
         {#if isAuthenticated}
         <div class="relative" use:clickOutside>
           <button on:click={() => showDropdown = !showDropdown} class="focus:outline-none">
-            <i class="fas fa-user-circle text-3xl"></i> <!-- Font Awesome Profile Icon -->
+            <i class="fas bg-cover text-3xl" style="background-image: url('profile.png'); border-width: 1px; border-radius: 20px" id="profile_photo"></i> <!-- Font Awesome Profile Icon -->
           </button>
           {#if showDropdown}
             <div class="absolute right-0 mt-2 w-48 bg-white shadow-xl rounded-md py-1 z-50">
               <a href="/profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
-              <a href="/settings" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a>
+
               <a href="/login" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" on:click|preventDefault={logout}>Log out</a>
             </div>
           {/if}
