@@ -1,4 +1,4 @@
-<script >
+<script>
   import '@fortawesome/fontawesome-free/css/all.css';
   import '@fortawesome/fontawesome-free/js/all.js';
   import '../app.css';
@@ -6,7 +6,7 @@
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
   import { authStore } from '$lib/authStore';
-  import { checkAuth } from '$lib/auth';
+  import { getUserInfo, userEmail } from '$lib/auth';
   import { page } from '$app/stores';
 
   let showDropdown = false;
@@ -15,6 +15,7 @@
   authStore.subscribe(value => { isAuthenticated = value; });
 
   onMount(() => {
+    getUserInfo($page.url.pathname);
     isAuthenticated = !!localStorage.getItem('token');
   });
 
@@ -41,17 +42,13 @@
       }
     };
   }
-  onMount(() => {
-    checkAuth($page.url.pathname);
-  })
 </script>
-
 
 <div class="flex flex-col h-screen justify-between bg-gray-100">
   <nav class="bg-blue-500 p-4 text-white">
     <div class="container mx-auto flex justify-between items-center">
       <div>
-        <h1 class="text-2xl"><a href="/">ProjectNaem</a></h1>
+        <h1 class="text-2xl"><a href="/">ProjectName</a></h1>
       </div>
       <div class="flex items-center">
         <ul class="flex space-x-4 mr-4">

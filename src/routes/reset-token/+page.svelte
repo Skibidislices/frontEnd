@@ -1,5 +1,5 @@
 <script>
-    import axios from 'axios';
+    import api from '$lib/axios';
     import { onMount } from 'svelte';
     let password = '';
     let message = '';
@@ -12,7 +12,7 @@
   
     async function resetPassword() {
       try {
-        await axios.post(`http://localhost:3010/auth/reset-password/${token}`, { password });
+        await api.post(`/auth/reset-password/${token}`, { password });
         message = 'Password reset successful! You can now log in with your new password.';
       } catch (error) {
         message = error.response.data.msg || 'Password reset failed';
