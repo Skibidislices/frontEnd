@@ -82,6 +82,23 @@
 <div class="file-list">
   {#if $jsonData}
     <h3>Uploaded Data:</h3>
-    <pre>{JSON.stringify($jsonData, null, 2)}</pre>
+    {#each $jsonData as item}
+    <div class="bg-blue-500 p-4 text-white m-1 rounded-lg">
+      <p>Name: {item.full_name}</p>
+      <p>Email: {item.email}</p>
+      <details>
+        <summary>Availability</summary>
+        <div class="space-y-2">
+          <p class="{item.Monday === 'yes' ? 'text-lime-400' : 'text-red-800'}">Monday: {item.Monday}</p>
+          <p class="{item.Tuesday === 'yes' ? 'text-lime-400' : 'text-red-800'}">Tuesday: {item.Tuesday}</p>
+          <p class="{item.wednesday === 'yes' ? 'text-lime-400' : 'text-red-800'}">Wednesday: {item.wednesday}</p>
+          <p class="{item.Thursday === 'yes' ? 'text-lime-400' : 'text-red-800'}">Thursday: {item.Thursday}</p>
+          <p class="{item.Friday === 'yes' ? 'text-lime-400' : 'text-red-800'}">Friday: {item.Friday}</p>
+          <p class="{item.Saturday === 'yes' ? 'text-lime-400' : 'text-red-800'}">Saturday: {item.Saturday}</p>
+          <p class="{item.Sunday === 'yes' ? 'text-lime-400' : 'text-red-800'}">Sunday: {item.Sunday}</p>
+        </div>
+      </details>
+    </div>
+    {/each}
   {/if}
 </div>
