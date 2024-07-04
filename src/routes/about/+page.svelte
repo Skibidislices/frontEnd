@@ -8,16 +8,6 @@
   let showModal = false;
   let selectedImage = null;
 
-  let exampleData = '';
-
-  onMount(async () => {
-    try {
-      const response = await axios.get('http://localhost:3010/example');
-      exampleData = response.data;
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    }
-  });
 </script>
 
 <svelte:head>
