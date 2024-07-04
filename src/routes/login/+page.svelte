@@ -25,4 +25,5 @@
   <input type="password" bind:value={password} placeholder="Password" class="w-full p-2 mb-4 border rounded" />
   <button class="bg-blue-500 text-white py-2 px-4 rounded shadow w-full" on:click={login}>Login</button>
   <p class="mt-4">{message}</p>
+  <a href="/reset-password" class="text-blue-500 hover:underline">Forgot password?</a>
 </div>

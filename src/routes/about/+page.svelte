@@ -2,6 +2,7 @@
   import { onMount } from 'svelte';
   import axios from 'axios';
   import devImg from '$lib/pics/Pic1.png';
+  import devImg2 from '$lib/pics/Pic2.png';
 
   let exampleData = '';
 
@@ -28,12 +29,13 @@
     <p class="text-gray-500">It is built using <a href="https://github.com/Skibidislices/frontEnd">SvelteKit</a> and <a href="https://github.com/Skibidislices/backEnd">NodeJS (ExpressJS)</a>.</p>
   </div>
 
-
   <div class="bg-white p-6 rounded-lg shadow-md">
-      <h2 class="text-2xl font-bold mb-2">Dev Process</h2>
-      <img src={devImg} alt="Dev Process" class="object-scale-down h-48 w-64 rounded-lg shadow-md mb-4">
+    <h2 class="text-2xl font-bold mb-2">Dev Process</h2>
+    <div class="flex justify-left space-x-4">
+      <img src={devImg} alt="Dev Process" class="object-scale-down h-48 w-64 rounded-lg shadow-md">
+      <img src={devImg2} alt="Dev Process" class="object-scale-down h-48 w-64 rounded-lg shadow-md">
+    </div>
   </div>
-
 
   <div class="bg-white p-6 rounded-lg shadow-md">
     <h2 class="text-2xl font-bold mb-2">Learning Outcomes</h2>
