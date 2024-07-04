@@ -23,6 +23,7 @@
   function logout(event) {
     event.preventDefault(); // Prevent default anchor behavior
     authStore.setToken(null); // Set auth store to false
+    showDropdown = false; // Close dropdown so it's not open on next login
     goto('/login'); // Redirect to login page
   }
 
