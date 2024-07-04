@@ -3,6 +3,7 @@
   import axios from 'axios';
   import devImg from '$lib/pics/Pic1.png';
   import devImg2 from '$lib/pics/Pic2.png';
+  import devImg3 from '$lib/pics/Pic3.png';
   import { goto } from '$app/navigation';
 
   let showModal = false;
@@ -37,6 +38,7 @@
     <div class="flex justify-left space-x-4">
       <img src={devImg} alt="Dev Process" class="object-scale-down h-48 w-64 rounded-lg shadow-md mb-4" on:click={() => {selectedImage = devImg; showModal = true;}}>
       <img src={devImg2} alt="Dev Process" class="object-scale-down h-48 w-64 rounded-lg shadow-md mb-4" on:click={() => {selectedImage = devImg2; showModal = true;}}>
+      <img src={devImg3} alt="Dev Process" class="object-scale-down h-48 w-64 rounded-lg shadow-md mb-4" on:click={() => {selectedImage = devImg3; showModal = true;}}>
     </div>
   </div>
 
