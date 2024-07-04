@@ -29,7 +29,7 @@
   <nav class="bg-blue-500 p-4 text-white">
     <div class="container mx-auto flex justify-between items-center">
       <div>
-        <h1 class="text-2xl">ProjectNaem</h1>
+        <h1 class="text-2xl"><a href="/">ProjectNaem</a></h1>
       </div>
       <div class="flex items-center">
         <ul class="flex space-x-4 mr-4">
