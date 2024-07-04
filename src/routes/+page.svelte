@@ -94,11 +94,6 @@
   <input type="file" accept=".xlsx, .xls" class="hidden-input" on:change={e => uploadFile(e.target.files[0])} />
 </div>
 
-<p>{message}</p>
-
-<div class="file-list">
-  {#if $jsonData}
-    <h3>Uploaded Data:</h3>
-    <pre>{JSON.stringify($jsonData, null, 2)}</pre>
-  {/if}
-</div>
+<style>
+  /* Please use tailwindcss predefined classes as much as possible */
+</style>
