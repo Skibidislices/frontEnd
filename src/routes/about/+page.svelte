@@ -55,3 +55,6 @@
     <p class="text-gray-700 mb-4">TODO</p>
   </div>
 </div>
+<style>
+  /* Please use tailwindcss predefined classes as much as possible */
+</style>
