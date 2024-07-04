@@ -4,12 +4,23 @@
   import '../app.css';
 
   import { onMount } from 'svelte';
+  import { goto } from '$app/navigation';
+  import { authStore } from '$lib/authStore';
   let showDropdown = false;
-  let isAuthenticated = false;
+  let isAuthenticated;
+
+  authStore.subscribe(value => { isAuthenticated = value; });
 
   onMount(() => {
     isAuthenticated = !!localStorage.getItem('token');
   });
+
+  // Logout function
+  function logout(event) {
+    event.preventDefault(); // Prevent default anchor behavior
+    authStore.setToken(null); // Set auth store to false
+    goto('/login'); // Redirect to login page
+  }
 
   // Custom action to detect click outside
   function clickOutside(node) {
@@ -57,9 +68,10 @@
           </li>
           {/if}
           {#if isAuthenticated}
-          <li><a href="/" class="hover:underline">Upload</a></li>
-          <li><a href="/" class="hover:underline">Dashboard</a></li>
-          <li><a href="/" class="hover:underline">Personal</a></li>
+          <li><a href="/upload" class="hover:underline">Upload</a></li>
+          <li><a href="/dashboard" class="hover:underline">Dashboard</a></li>
+          <li><a href="/personal" class="hover:underline">Personal</a></li>
+          <li><a href="/about" class="hover:underline">About</a>
           {/if}
         </ul>
         {#if isAuthenticated}
@@ -71,7 +83,7 @@
             <div class="absolute right-0 mt-2 w-48 bg-white shadow-xl rounded-md py-1 z-50">
               <a href="/profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
               <a href="/settings" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a>
-              <a href="/logout" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Log out</a>
+              <a href="/login" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" on:click|preventDefault={logout}>Log out</a>
             </div>
           {/if}
         </div>
