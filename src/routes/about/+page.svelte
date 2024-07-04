@@ -3,6 +3,10 @@
   import axios from 'axios';
   import devImg from '$lib/pics/Pic1.png';
   import devImg2 from '$lib/pics/Pic2.png';
+  import { goto } from '$app/navigation';
+
+  let showModal = false;
+  let selectedImage = null;
 
   let exampleData = '';
 
@@ -20,6 +24,15 @@
   <title>About</title>
   <meta name="description" content="About this project" />
 </svelte:head>
+
+{#if showModal}
+<div class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center" on:click={() => showModal = false}>
+  <div class="bg-white p-6 rounded shadow-md max-w-full max-h-full overflow-hidden" on:click|stopPropagation>
+    <img src={selectedImage} alt="Selected Image" class="object-contain rounded-lg shadow-md" style="max-height: 90vh; width: auto;">
+  </div>
+</div>
+{/if}
+
 <div class="flex flex-col justify-evenly space-y-4">
   <div class="bg-white p-6 rounded-lg shadow-md">
     <h2 class="text-2xl font-bold mb-2">About this project</h2>
@@ -32,8 +45,8 @@
   <div class="bg-white p-6 rounded-lg shadow-md">
     <h2 class="text-2xl font-bold mb-2">Dev Process</h2>
     <div class="flex justify-left space-x-4">
-      <img src={devImg} alt="Dev Process" class="object-scale-down h-48 w-64 rounded-lg shadow-md">
-      <img src={devImg2} alt="Dev Process" class="object-scale-down h-48 w-64 rounded-lg shadow-md">
+      <img src={devImg} alt="Dev Process" class="object-scale-down h-48 w-64 rounded-lg shadow-md mb-4" on:click={() => {selectedImage = devImg; showModal = true;}}>
+      <img src={devImg2} alt="Dev Process" class="object-scale-down h-48 w-64 rounded-lg shadow-md mb-4" on:click={() => {selectedImage = devImg2; showModal = true;}}>
     </div>
   </div>
 
@@ -42,6 +55,3 @@
     <p class="text-gray-700 mb-4">TODO</p>
   </div>
 </div>
-<style>
-  /* Please use tailwindcss predefined classes as much as possible */
-</style>
