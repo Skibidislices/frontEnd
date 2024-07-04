@@ -5,6 +5,11 @@
 
   import { onMount } from 'svelte';
   let showDropdown = false;
+  let isAuthenticated = false;
+
+  onMount(() => {
+    isAuthenticated = !!localStorage.getItem('token');
+  });
 
   // Custom action to detect click outside
   function clickOutside(node) {
@@ -44,13 +49,20 @@
       </div>
       <div class="flex items-center">
         <ul class="flex space-x-4 mr-4">
+          {#if !isAuthenticated}
           <li><a href="/register" class="hover:underline">Register</a></li>
           <li><a href="/login" class="hover:underline">Login</a></li>
           <li><a href="/reset-password" class="hover:underline">Reset Password</a></li>
+          <li><a href="/about" class="hover:underline">About</a>
+          </li>
+          {/if}
+          {#if isAuthenticated}
           <li><a href="/" class="hover:underline">Upload</a></li>
           <li><a href="/" class="hover:underline">Dashboard</a></li>
           <li><a href="/" class="hover:underline">Personal</a></li>
+          {/if}
         </ul>
+        {#if isAuthenticated}
         <div class="relative" use:clickOutside>
           <button on:click={() => showDropdown = !showDropdown} class="focus:outline-none">
             <i class="fas fa-user-circle text-3xl"></i> <!-- Font Awesome Profile Icon -->
@@ -59,11 +71,11 @@
             <div class="absolute right-0 mt-2 w-48 bg-white shadow-xl rounded-md py-1 z-50">
               <a href="/profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
               <a href="/settings" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a>
-              <a href="/about" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">About</a>
               <a href="/logout" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Log out</a>
             </div>
           {/if}
         </div>
+        {/if}
       </div>
     </div>
   </nav>
