@@ -394,7 +394,7 @@
 </style>
 
 <div class="border-dashed border-2 border-blue-500 p-4 max-w-md mx-auto mt-5 rounded-lg shadow-lg">
-  <p class="text-center text-black font-normal">Drag and drop another file to preview.</p>
+  <p class="text-center text-black font-normal">Drag and drop a file to preview.</p>
 </div>
 
 <div class="drop-zone { $isDragging ? 'active' : '' }">
