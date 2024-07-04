@@ -63,8 +63,7 @@
           </li>
           {/if}
           {#if isAuthenticated}
-          <li><a href="/upload" class="hover:underline">Upload</a></li>
-          <li><a href="/dashboard" class="hover:underline">Dashboard</a></li>
+          <li><a href="/" class="hover:underline">Dashboard</a></li>
           <li><a href="/personal" class="hover:underline">Personal</a></li>
           <li><a href="/about" class="hover:underline">About</a>
           {/if}
