@@ -6,9 +6,13 @@
   let isDragging = writable(false);
   let file = null;
   let message = '';
-  let jsonData = writable([]);
+  let jsonData = writable({});
+  let selectedSheetIndex = 0; // Added to track the selected sheet index
+  let sheetsData = []; // This will hold the actual data for each sheet
+  let selectedSheetData = writable({}); // This will hold the data for the selected sheet
 
-  console.log(jsonData)
+
+  console.log(jsonData);
 
   function handleDragOver(event) {
     event.preventDefault();
@@ -39,6 +43,7 @@
         }
       });
       jsonData.set(response.data);
+      sheetsData = Object.values(response.data); // Assuming the response data is an object with sheet names as keys
       message = 'File uploaded successfully';
     } catch (error) {
       message = 'Error uploading file';
@@ -46,16 +51,20 @@
     }
   }
 
-  /**
-     * @type {any[]}
-     */
   let jsonKeys = [];
-  $: jsonData.subscribe(data => {
-    if (data) {
-      jsonKeys = Object.keys(data);
-      console.log('Received JSON data:', jsonKeys);
+  $: if ($jsonData) {
+    jsonKeys = Object.keys($jsonData);
+    console.log('Received JSON data:', jsonKeys);
+  }
+
+  // Function to handle changes in selection
+  function handleSelectionChange() {
+    if (sheetsData.length > selectedSheetIndex) {
+      const selectedData = sheetsData[selectedSheetIndex];
+      selectedSheetData.set(selectedData); // Update selectedSheetData with the selected sheet's data
     }
-  });
+  }
+  $: $jsonData, sheetsData = Object.values($jsonData);
 </script>
 
 <style>
@@ -89,14 +98,17 @@
 <div class="file-list">
   {#if $jsonData}
     <h3>Uploaded Data:</h3>
-    <!-- <pre>{JSON.stringify($jsonData, null, 2)}</pre> -->
     <label for="tables">Choose a table you want to display:</label>
-    <select bind:value={jsonData}>
+    <select bind:value={selectedSheetIndex} on:change={handleSelectionChange}>
       {#if jsonKeys}
-      {#each jsonKeys as item}
-          <option value="{item}">{item}</option>
+      {#each jsonKeys as item, index}
+          <option value="{index}">{item}</option>
       {/each}
       {/if}
     </select>
+    <!-- Displaying the selected sheet's data -->
+    {#if $selectedSheetData}
+      <pre>{JSON.stringify($selectedSheetData, null, 2)}</pre>
+    {/if}
   {/if}
 </div>
