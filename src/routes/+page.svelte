@@ -393,6 +393,10 @@
   }
 </style>
 
+<div class="border-dashed border-2 border-blue-500 p-4 max-w-md mx-auto mt-5 rounded-lg shadow-lg">
+  <p class="text-center text-black font-normal">Drag and drop another file to preview.</p>
+</div>
+
 <div class="drop-zone { $isDragging ? 'active' : '' }">
   <p>Drag and drop your Excel file here</p>
   <input type="file" accept=".xlsx, .xls" class="hidden-input" on:change={e => uploadFile(e.target.files[0])} />
