@@ -1,22 +1,22 @@
 <script>
-  import { onMount, onDestroy } from 'svelte';
-  import { writable } from 'svelte/store';
+  import { onMount } from 'svelte';
   import api from '$lib/axios';
+  import { writable } from 'svelte/store';
 
   let isDragging = writable(false);
   let file = null;
   let message = '';
-  let jsonData = writable(null);
+  let jsonData = writable([]);
+
+  console.log(jsonData)
 
   function handleDragOver(event) {
     event.preventDefault();
     isDragging.set(true);
   }
 
-  function handleDragLeave(event) {
-    if (event.clientX === 0 && event.clientY === 0) {
-      isDragging.set(false);
-    }
+  function handleDragLeave() {
+    isDragging.set(false);
   }
 
   function handleDrop(event) {
@@ -46,52 +46,42 @@
     }
   }
 
+  /**
+     * @type {any[]}
+     */
+  let jsonKeys = [];
   $: jsonData.subscribe(data => {
     if (data) {
-      console.log('Received JSON data:', data);
+      jsonKeys = Object.keys(data);
+      console.log('Received JSON data:', jsonKeys);
     }
-  });
-
-  onMount(() => {
-    document.addEventListener('dragover', handleDragOver);
-    document.addEventListener('dragleave', handleDragLeave);
-    document.addEventListener('drop', handleDrop);
   });
 </script>
 
 <style>
   .drop-zone {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: rgba(0, 0, 0, 0.7);
-    color: white;
-    font-size: 1.5rem;
-    z-index: 1000;
-    transition: opacity 0.3s ease;
-    opacity: 0;
-    pointer-events: none;
+    border: 2px dashed #cccccc;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    transition: background-color 0.3s ease;
   }
-  .drop-zone.active {
-    opacity: 1;
-    pointer-events: all;
-  }
-  .hidden-input {
-    display: none;
+  .drop-zone.dragging {
+    background-color: #f0f0f0;
   }
   .file-list {
     margin-top: 20px;
   }
 </style>
 
-<div class="drop-zone { $isDragging ? 'active' : '' }">
-  <p>Drag and drop your Excel file here</p>
-  <input type="file" accept=".xlsx, .xls" class="hidden-input" on:change={e => uploadFile(e.target.files[0])} />
+<div 
+  class="drop-zone { $isDragging ? 'dragging' : '' }"
+  on:dragover={handleDragOver}
+  on:dragleave={handleDragLeave}
+  on:drop={handleDrop}
+>
+  <p>Drag and drop your Excel file here, or click to select file</p>
+  <input type="file" accept=".xlsx, .xls" on:change={e => uploadFile(e.target.files[0])} style="display: none;" />
 </div>
 
 <p>{message}</p>
@@ -99,6 +89,14 @@
 <div class="file-list">
   {#if $jsonData}
     <h3>Uploaded Data:</h3>
-    <pre>{JSON.stringify($jsonData, null, 2)}</pre>
+    <!-- <pre>{JSON.stringify($jsonData, null, 2)}</pre> -->
+    <label for="tables">Choose a table you want to display:</label>
+    <select bind:value={jsonData}>
+      {#if jsonKeys}
+      {#each jsonKeys as item}
+          <option value="{item}">{item}</option>
+      {/each}
+      {/if}
+    </select>
   {/if}
 </div>
