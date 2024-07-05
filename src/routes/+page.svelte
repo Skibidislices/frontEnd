@@ -16,9 +16,11 @@
 
   let teacherHoursChart = writable({});
   let studentHoursChart = writable({});
-  let studentsPerStudyChart = writable({});
+  let courseHoursChart = writable({});
   let classesPerDayChart = writable({});
   let wrongScheduleEntries = writable([]);
+  let teacherTimeframe = writable('all');
+  let studentTimeframe = writable('all');
 
   onMount(async () => {
     document.addEventListener('dragover', handleDragOver);
@@ -92,131 +94,15 @@
   }
 
   function createCharts() {
-    const teacherHours = teachersData.map(teacher => {
-      const totalHours = calculateTeacherHours(teacher).totalHours;
-      return { teacher: teacher.full_name, totalHours };
-    });
+    updateTeacherHoursChart('all');
+    updateStudentHoursChart('all');
+    updateCourseHoursChart('all');
+    createClassesPerDayChart();
+  }
 
-    const teacherLabels = teacherHours.map(t => t.teacher);
-    const teacherData = teacherHours.map(t => t.totalHours);
-
-    teacherHoursChart.set({
-      type: 'bar',
-      data: {
-        labels: teacherLabels,
-        datasets: [
-          {
-            label: 'Total Hours per Teacher',
-            data: teacherData,
-            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-            borderColor: 'rgba(75, 192, 192, 1)',
-            borderWidth: 1,
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        scales: {
-          x: {
-            title: {
-              display: true,
-              text: 'Teachers'
-            }
-          },
-          y: {
-            title: {
-              display: true,
-              text: 'Hours'
-            }
-          }
-        }
-      },
-    });
-
-    const studentHours = studentsData.map(student => {
-      const totalHours = calculateStudentHours(student).totalHours;
-      return { student: student.full_name, totalHours };
-    });
-
-    const studentLabels = studentHours.map(s => s.student);
-    const studentData = studentHours.map(s => s.totalHours);
-
-    studentHoursChart.set({
-      type: 'bar',
-      data: {
-        labels: studentLabels,
-        datasets: [
-          {
-            label: 'Total Hours per Student',
-            data: studentData,
-            backgroundColor: 'rgba(255, 159, 64, 0.2)',
-            borderColor: 'rgba(255, 159, 64, 1)',
-            borderWidth: 1,
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        scales: {
-          x: {
-            title: {
-              display: true,
-              text: 'Students'
-            }
-          },
-          y: {
-            title: {
-              display: true,
-              text: 'Hours'
-            }
-          }
-        }
-      },
-    });
-
-    const studyProgramCount = studentsData.reduce((acc, student) => {
-      acc[student.study] = (acc[student.study] || 0) + 1;
-      return acc;
-    }, {});
-
-    const studyLabels = Object.keys(studyProgramCount);
-    const studentCounts = Object.values(studyProgramCount);
-
-    studentsPerStudyChart.set({
-      type: 'pie',
-      data: {
-        labels: studyLabels,
-        datasets: [
-          {
-            label: 'Students per Study Program',
-            data: studentCounts,
-            backgroundColor: [
-              'rgba(255, 99, 132, 0.2)',
-              'rgba(54, 162, 235, 0.2)',
-              'rgba(255, 206, 86, 0.2)',
-              'rgba(75, 192, 192, 0.2)',
-              'rgba(153, 102, 255, 0.2)',
-              'rgba(255, 159, 64, 0.2)',
-            ],
-            borderColor: [
-              'rgba(255, 99, 132, 1)',
-              'rgba(54, 162, 235, 1)',
-              'rgba(255, 206, 86, 1)',
-              'rgba(75, 192, 192, 1)',
-              'rgba(153, 102, 255, 1)',
-              'rgba(255, 159, 64, 1)',
-            ],
-            borderWidth: 1,
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-      },
-    });
-
+  function createClassesPerDayChart() {
     const classesPerDayCount = timetableData.reduce((acc, entry) => {
-      acc[entry.date] = (acc[entry.date] || 0) + 1;
+      acc[new Date(entry.start_time).toLocaleDateString('en-US')] = (acc[new Date(entry.start_time).toLocaleDateString('en-US')] || 0) + 1;
       return acc;
     }, {});
 
@@ -257,50 +143,174 @@
     });
   }
 
-  function calculateTeacherHours(teacher) {
-    const activities = timetableData.filter(activity => activity["teacher email"] === teacher.email);
+  function calculateHours(activities) {
     let totalHours = 0;
 
     activities.forEach(activity => {
-      const [startTime, endTime] = activity["time slot"].split('-').map(time => {
-        const [hours, minutes] = time.split(':');
-        return parseInt(hours) + parseInt(minutes) / 60;
-      });
-      totalHours += (endTime - startTime);
+      const duration = (new Date(activity.end_time) - new Date(activity.start_time)) / (1000 * 60 * 60);
+      totalHours += duration;
     });
 
-    return { totalHours };
+    return totalHours;
   }
 
-  function calculateStudentHours(student) {
-    const activities = timetableData.filter(activity => activity["student group"] === student["group name"]);
-    let totalHours = 0;
+  function filterActivitiesByTimeframe(activities, timeframe) {
+    if (timeframe == 'all') return activities;
 
-    activities.forEach(activity => {
-      const [startTime, endTime] = activity["time slot"].split('-').map(time => {
-        const [hours, minutes] = time.split(':');
-        return parseInt(hours) + parseInt(minutes) / 60;
-      });
-      totalHours += (endTime - startTime);
+    const now = new Date();
+    let startDate;
+
+    switch (timeframe) {
+      case 'week':
+        startDate = new Date();
+        startDate.setDate(now.getDate() - 7);
+        break;
+      case 'month':
+        startDate = new Date();
+        startDate.setMonth(now.getMonth() - 1);
+        break;
+      case 'all':
+      default:
+        return activities;
+    }
+
+    return activities.filter(activity => new Date(activity.start_time) >= startDate);
+  }
+
+  function updateTeacherHoursChart(timeframe) {
+    const teacherHours = teachersData.map(teacher => {
+      const activities = filterActivitiesByTimeframe(timetableData.filter(activity => activity["teacher_id"] === teacher.id), timeframe);
+      const totalHours = calculateHours(activities);
+      return { teacher: teacher.name, totalHours };
     });
 
-    return { totalHours };
+    const teacherLabels = teacherHours.map(t => t.teacher);
+    const teacherData = teacherHours.map(t => t.totalHours);
+
+    teacherHoursChart.set({
+      type: 'bar',
+      data: {
+        labels: teacherLabels,
+        datasets: [
+          {
+            label: 'Total Hours per Teacher',
+            data: teacherData,
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            borderColor: 'rgba(75, 192, 192, 1)',
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        scales: {
+          x: {
+            title: {
+              display: true,
+              text: 'Teachers'
+            }
+          },
+          y: {
+            title: {
+              display: true,
+              text: 'Hours'
+            }
+          }
+        }
+      },
+    });
   }
+
+  function updateStudentHoursChart(timeframe) {
+    const studentHours = studentsData.map(student => {
+      const activities = filterActivitiesByTimeframe(timetableData.filter(activity => activity["group"] === student.group), timeframe);
+      const totalHours = calculateHours(activities);
+      return { student: student.name, totalHours };
+    });
+
+    const studentLabels = studentHours.map(s => s.student);
+    const studentData = studentHours.map(s => s.totalHours);
+
+    studentHoursChart.set({
+      type: 'bar',
+      data: {
+        labels: studentLabels,
+        datasets: [
+          {
+            label: 'Total Hours per Student',
+            data: studentData,
+            backgroundColor: 'rgba(255, 159, 64, 0.2)',
+            borderColor: 'rgba(255, 159, 64, 1)',
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        scales: {
+          x: {
+            title: {
+              display: true,
+              text: 'Students'
+            }
+          },
+          y: {
+            title: {
+              display: true,
+              text: 'Hours'
+            }
+          }
+        }
+      },
+    });
+  }
+
+  function updateCourseHoursChart(timeframe) {
+    const courseHours = coursesData.map(course => {
+      const activities = filterActivitiesByTimeframe(timetableData.filter(activity => activity["course_id"] === course.id), timeframe);
+      const totalHours = calculateHours(activities);
+      return { course: course.name, totalHours };
+    });
+
+    const courseLabels = courseHours.map(c => c.course);
+    const courseData = courseHours.map(c => c.totalHours);
+    const backgroundColors = courseHours.map((_, i) => `hsl(${i * 360 / courseHours.length}, 70%, 50%)`);
+
+    courseHoursChart.set({
+      type: 'pie',
+      data: {
+        labels: courseLabels,
+        datasets: [
+          {
+            label: 'Total Hours per Course',
+            data: courseData,
+            backgroundColor: backgroundColors,
+            borderColor: backgroundColors.map(color => color.replace('50%', '40%')),
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+      },
+    });
+  }
+
 
   function findWrongScheduleEntries() {
     const wrongEntries = [];
 
     teachersData.forEach(teacher => {
-      const activities = timetableData.filter(activity => activity["teacher email"] === teacher.email);
+      const activities = timetableData.filter(activity => activity["teacher_id"] === teacher.id);
 
       activities.forEach(activity => {
-        let day = new Date(activity.date).toLocaleDateString('en-US', { weekday: 'long' });
-        day = day.charAt(0).toUpperCase() + day.slice(1).toLowerCase();
-        if (teacher[day] === 'no' || (teacher['specific days off'] && teacher['specific days off'].split(', ').includes(activity.date))) {
+        let day = new Date(activity.start_time).toLocaleDateString('en-US', { weekday: 'long' });
+        day = day.toLowerCase();
+        if (teacher[day] === 'no' || (teacher.specific_days_off && teacher.specific_days_off.split(', ').includes(new Date(activity.start_time).toLocaleDateString('en-US')))) {
           wrongEntries.push({
-            teacher: teacher.full_name,
-            date: activity.date,
-            timeSlot: activity["time slot"],
+            teacher: teacher.name,
+            date: new Date(activity.start_time).toLocaleDateString('en-US'),
+            timeSlot: `${new Date(activity.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${new Date(activity.end_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
             classroom: activity.classroom,
           });
         }
@@ -309,18 +319,6 @@
 
     wrongScheduleEntries.set(wrongEntries);
   }
-
-  onMount(() => {
-    document.addEventListener('dragover', handleDragOver);
-    document.addEventListener('dragleave', handleDragLeave);
-    document.addEventListener('drop', handleDrop);
-
-    return () => {
-      document.removeEventListener('dragover', handleDragOver);
-      document.removeEventListener('dragleave', handleDragLeave);
-      document.removeEventListener('drop', handleDrop);
-    };
-  });
 </script>
 
 <style>
@@ -391,6 +389,9 @@
   .teacher-selection {
     margin-top: 20px;
   }
+  .timeframe-selector {
+    margin-bottom: 10px;
+  }
 </style>
 
 <div class="border-dashed border-2 border-blue-500 p-4 max-w-md mx-auto mt-5 rounded-lg shadow-lg">
@@ -402,18 +403,29 @@
   <input type="file" accept=".xlsx, .xls" class="hidden-input" on:change={e => uploadFile(e.target.files[0])} />
 </div>
 
-<p>{message}</p>
-
 <div class="file-list">
   {#if $jsonData}
   <div class="section">
     <div class="chart-container">
       <h2>Total Hours per Teacher</h2>
+      <div class="timeframe-selector">
+        <label for="teacher-timeframe">Timeframe:</label>
+        <select id="teacher-timeframe" on:change={(e) => updateTeacherHoursChart(e.target.value)}>
+          <option value="all">All Time</option>
+          <option value="month">Last Month</option>
+          <option value="week">Last Week</option>
+        </select>
+      </div>
       {#if $teacherHoursChart}
       <Chart type={$teacherHoursChart.type} data={$teacherHoursChart.data} options={$teacherHoursChart.options} />
       {/if}
     </div>
-
+    <div class="chart-container">
+      <h2>Classes per Day</h2>
+      {#if $classesPerDayChart}
+      <Chart type={$classesPerDayChart.type} data={$classesPerDayChart.data} options={$classesPerDayChart.options} />
+      {/if}
+    </div>
     <div class="conflicts">
       <h2>Wrong Schedule Entries</h2>
       <ul>
@@ -429,20 +441,22 @@
   <div class="section">
     <div class="chart-container">
       <h2>Total Hours per Student</h2>
+      <div class="timeframe-selector">
+        <label for="student-timeframe">Timeframe:</label>
+        <select id="student-timeframe" on:change={(e) => updateStudentHoursChart(e.target.value)}>
+          <option value="all">All Time</option>
+          <option value="month">Last Month</option>
+          <option value="week">Last Week</option>
+        </select>
+      </div>
       {#if $studentHoursChart}
       <Chart type={$studentHoursChart.type} data={$studentHoursChart.data} options={$studentHoursChart.options} />
       {/if}
     </div>
     <div class="chart-container">
-      <h2>Classes per Day</h2>
-      {#if $classesPerDayChart}
-      <Chart type={$classesPerDayChart.type} data={$classesPerDayChart.data} options={$classesPerDayChart.options} />
-      {/if}
-    </div>
-    <div class="chart-container">
-      <h2>Total Hours per Study Program</h2>
-      {#if $studentsPerStudyChart}
-      <Chart type={$studentsPerStudyChart.type} data={$studentsPerStudyChart.data} options={$studentsPerStudyChart.options} />
+      <h2>Total Hours per Course</h2>
+      {#if $courseHoursChart}
+      <Chart type={$courseHoursChart.type} data={$courseHoursChart.data} options={$courseHoursChart.options} />
       {/if}
     </div>
   </div>

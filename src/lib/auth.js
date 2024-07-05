@@ -10,6 +10,7 @@ export async function getUserInfo(routeId) {
     const response = await api.get('/auth/me');
     userEmail.set(response.data.email);
   } catch (error) {
+    localStorage.removeItem('token');
     if (!publicRoutes.includes(routeId)) {
       goto('/login');
     }
