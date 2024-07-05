@@ -45,7 +45,7 @@
   }
 </script>
 
-<div class="flex flex-col h-screen justify-between bg-gray-100">
+<div class="flex flex-col h-screen justify-between">
   <nav class="bg-blue-500 p-4 text-white">
     <div class="container mx-auto flex justify-between items-center">
       <div>
