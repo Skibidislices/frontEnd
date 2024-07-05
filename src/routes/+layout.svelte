@@ -49,7 +49,7 @@
   <nav class="bg-blue-500 p-4 text-white">
     <div class="container mx-auto flex justify-between items-center">
       <div>
-        <h1 class="text-2xl"><a href="/">ProjectName</a></h1>
+        <h1 class="text-2xl"><a href="/">Good<b>4</b>You</a></h1>
       </div>
       <div class="flex items-center">
         <ul class="flex space-x-4 mr-4">
