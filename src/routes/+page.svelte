@@ -36,12 +36,14 @@
       message = 'Error loading data';
       console.error('Error loading data:', error);
     }
+  });
 
-    return () => {
+  onDestroy(async () => {
+    if (typeof document !== 'undefined') {
       document.removeEventListener('dragover', handleDragOver);
       document.removeEventListener('dragleave', handleDragLeave);
       document.removeEventListener('drop', handleDrop);
-    };
+    }
   });
 
   function handleDragOver(event) {
@@ -394,13 +396,9 @@
   }
 </style>
 
+<div class="drop-zone { $isDragging ? 'active' : '' }"></div>
 <div class="border-dashed border-2 border-blue-500 p-4 max-w-md mx-auto mt-5 rounded-lg shadow-lg">
   <p class="text-center text-black font-normal">Drag and drop a file to preview.</p>
-</div>
-
-<div class="drop-zone { $isDragging ? 'active' : '' }">
-  <p>Drag and drop your Excel file here</p>
-  <input type="file" accept=".xlsx, .xls" class="hidden-input" on:change={e => uploadFile(e.target.files[0])} />
 </div>
 
 <div class="file-list">
